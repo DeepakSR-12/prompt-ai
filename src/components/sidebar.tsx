@@ -13,6 +13,7 @@ import {
 import { Montserrat } from "next/font/google";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 const montserrat = Montserrat({
   weight: "600",
@@ -21,7 +22,7 @@ const montserrat = Montserrat({
 
 const routes = [
   {
-    label: "Dasbboard",
+    label: "Dashboard",
     icon: LayoutDashboard,
     href: "/dashboard",
     color: "text-sky-500",
@@ -64,6 +65,7 @@ const routes = [
 ];
 
 const SideBar = () => {
+  const pathname = usePathname();
   return (
     <div className="flex flex-col space-y-4 py-4 h-full text-white bg-[#111827]">
       <div className="px-3 py-2 flex-1">
@@ -80,7 +82,12 @@ const SideBar = () => {
             <Link
               href={route.href}
               key={route.href}
-              className="flex text-sm group p-3 w-full justify-start font-medium cursor-pointer hover:text-white hover:bg-white/10 transition rounded-lg"
+              className={cn(
+                "flex text-sm group p-3 w-full justify-start font-medium cursor-pointer hover:text-white hover:bg-white/10 transition rounded-lg",
+                pathname === route.href
+                  ? "text-white bg-white/10"
+                  : "text-zinc-400"
+              )}
             >
               <div className="flex items-center flex-1">
                 <route.icon className={cn("w-5 h-5 mr-2", route.color)} />
