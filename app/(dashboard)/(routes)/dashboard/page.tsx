@@ -1,12 +1,5 @@
-import { UserButton } from "@clerk/nextjs";
+const DashboardPage = () => {
+  return <div>Dashboard</div>;
+};
 
-export interface IDashboardPageProps {}
-
-export default function DashboardPage(props: IDashboardPageProps) {
-  return (
-    <div>
-      Dashboard page
-      <UserButton afterSignOutUrl="/" />
-    </div>
-  );
-}
+export default DashboardPage;
