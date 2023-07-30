@@ -36,13 +36,16 @@ import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/components/ui/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import Link from "next/link";
+import { useProModal } from "@/hooks/use-pro-modal";
+import { toast } from "react-hot-toast";
 
 const ImagePage = () => {
   const router = useRouter();
   const [images, setImages] = useState<string[]>([]);
   const [open, setOpen] = useState<boolean>(false);
   const [key, setKey] = useState<string>("");
-  const { toast } = useToast();
+  const { toast: shadToast } = useToast();
+  const proModal = useProModal();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -58,7 +61,7 @@ const ImagePage = () => {
   const generateImage = async () => {
     try {
       if (!key) {
-        toast({
+        shadToast({
           title: "No API key available",
           description: "Please enter a valid Open AI API key",
         });
@@ -73,7 +76,7 @@ const ImagePage = () => {
       });
 
       if (response.data.status === 401) {
-        toast({
+        shadToast({
           title: "Invalid API Key",
           description: "Please enter a valid Open AI API key",
         });
@@ -82,8 +85,12 @@ const ImagePage = () => {
       const urls = response.data.map((image: { url: string }) => image.url);
       setImages(urls);
       form.reset();
-    } catch (error) {
-      console.log(error);
+    } catch (error: any) {
+      if (error?.response?.status === 403) {
+        proModal.onOpen();
+      } else {
+        toast.error("Something went wrong.");
+      }
     } finally {
       router.refresh();
     }
@@ -109,7 +116,8 @@ const ImagePage = () => {
           <AlertTitle>Heads up!</AlertTitle>
           <AlertDescription className="text-sm text-muted-foreground">
             Image generation is a premium resource heavy feature which requires
-            user's Open AI API key. <br /> Obtain an OpenAI API Key from &nbsp;
+            user&apos;s Open AI API key. <br /> Obtain an OpenAI API Key from
+            &nbsp;
             <Link
               href="https://platform.openai.com/account/api-keys"
               target="_blank"
