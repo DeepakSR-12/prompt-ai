@@ -37,7 +37,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import Link from "next/link";
 
-const ConversationPage = () => {
+const ImagePage = () => {
   const router = useRouter();
   const [images, setImages] = useState<string[]>([]);
   const [open, setOpen] = useState<boolean>(false);
@@ -264,4 +264,4 @@ const ConversationPage = () => {
   );
 };
 
-export default ConversationPage;
+export default ImagePage;
