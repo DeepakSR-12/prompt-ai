@@ -11,11 +11,13 @@ import {
   Music,
   Settings,
   VideoIcon,
+  Zap,
 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 
 import { cn } from "@/lib/utils";
 import { FreeCounter } from "@/components/free-counter";
+import { useProModal } from "@/hooks/use-pro-modal";
 
 const poppins = Montserrat({ weight: "600", subsets: ["latin"] });
 
@@ -43,12 +45,14 @@ const routes = [
     icon: VideoIcon,
     color: "text-orange-700",
     href: "/video",
+    isPremium: true,
   },
   {
     label: "Music Generation",
     icon: Music,
     color: "text-emerald-500",
     href: "/music",
+    isPremium: true,
   },
   {
     label: "Code Generation",
@@ -72,6 +76,7 @@ export const Sidebar = ({
 }) => {
   const pathname = usePathname();
   const router = useRouter();
+  const proModal = useProModal();
 
   return (
     <div className="space-y-4 py-4 flex flex-col h-full bg-[#111827] text-white">
@@ -101,7 +106,13 @@ export const Sidebar = ({
             >
               <div className="flex items-center flex-1">
                 <route.icon className={cn("h-5 w-5 mr-3", route.color)} />
-                {route.label}
+                {route.label}{" "}
+                {!isPro && route.isPremium && (
+                  <Zap
+                    onClick={() => proModal.onOpen()}
+                    className="w-4 h-4 ml-2 fill-purple-700 text-purple-500 cursor-pointer"
+                  />
+                )}
               </div>
             </Link>
           ))}

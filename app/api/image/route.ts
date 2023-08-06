@@ -26,7 +26,7 @@ async function generateImages(
         width: parseInt(width),
         height: parseInt(height),
       },
-      model: "prompthero/openjourney-v4",
+      model: "runwayml/stable-diffusion-v1-5",
     });
     const base64 = await blobToBase64(blob);
     const imageUrl = `data:image/png;base64,${base64}`;

@@ -39,6 +39,10 @@ const VideoPage = () => {
       form.reset();
     } catch (error: any) {
       if (error?.response?.status === 403) {
+        toast.error(
+          "Video Generation is a premium feature. Please upgrade to pro.",
+          { duration: 2000 }
+        );
         proModal.onOpen();
       } else {
         toast.error("Something went wrong.");
