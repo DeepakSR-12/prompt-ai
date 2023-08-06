@@ -2,15 +2,46 @@ import { checkApiLimit, incrementApiLimit } from "@/lib/api-limit";
 import { checkSubscription } from "@/lib/subscription";
 import { auth } from "@clerk/nextjs";
 import { NextResponse } from "next/server";
-import { Configuration, OpenAIApi } from "openai";
+import { HfInference } from "@huggingface/inference";
+
+async function blobToBase64(blob: Blob) {
+  const buffer = Buffer.from(await blob.arrayBuffer());
+  return buffer.toString("base64");
+}
+
+async function generateImages(
+  prompt: string,
+  numImages: number,
+  width: string,
+  height: string
+) {
+  const TOKEN = "";
+  const hf = new HfInference(TOKEN);
+
+  const images = [];
+  for (let i = 0; i < numImages; i++) {
+    const blob = await hf.textToImage({
+      inputs: prompt,
+      parameters: {
+        width: parseInt(width),
+        height: parseInt(height),
+      },
+      model: "prompthero/openjourney-v4",
+    });
+    const base64 = await blobToBase64(blob);
+    const imageUrl = `data:image/png;base64,${base64}`;
+    images.push(imageUrl);
+  }
+  return images;
+}
 
 export async function POST(req: Request) {
   try {
     const { userId } = auth();
     const body = await req.json();
-    const { prompt, amount = 1, resolution = "512x512", apiKey } = body;
+    const { prompt, amount = 1, resolution = "512x512" } = body;
 
-    if (!userId || !apiKey) {
+    if (!userId) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
@@ -36,26 +67,17 @@ export async function POST(req: Request) {
       );
     }
 
-    const configuration = new Configuration({
-      apiKey,
-    });
+    const [width, height] = resolution.split("x");
 
-    const openai = new OpenAIApi(configuration);
+    const response = await generateImages(prompt, amount, width, height);
 
-    const response = await openai.createImage({
-      prompt,
-      n: parseInt(amount, 10),
-      size: resolution,
-    });
-
-    if (!response.data) {
-      return new NextResponse("API call failed", { status: response.status });
+    if (!response) {
+      return new NextResponse("API call failed", { status: 400 });
     }
 
     if (!isPro) await incrementApiLimit();
 
-    const data = await response.data.data;
-    return NextResponse.json(data);
+    return NextResponse.json(response);
   } catch (error) {
     console.log("[IMAGE_ERROR]", error);
     return NextResponse.json(error);
