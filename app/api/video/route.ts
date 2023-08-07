@@ -1,4 +1,4 @@
-import { checkApiLimit, incrementApiLimit } from "@/lib/api-limit";
+import { incrementApiLimit } from "@/lib/api-limit";
 import { checkSubscription } from "@/lib/subscription";
 import { auth } from "@clerk/nextjs";
 import { NextResponse } from "next/server";
@@ -7,7 +7,7 @@ import Replicate from "replicate";
 const replicate = new Replicate({
   // Todo: Enable in production
   // auth: process.env.REPLICATE_API_KEY!,
-  auth: "",
+  auth: "1234",
 });
 
 export async function POST(req: Request) {
