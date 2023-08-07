@@ -52,7 +52,6 @@ const routes = [
     icon: Music,
     color: "text-emerald-500",
     href: "/music",
-    isPremium: true,
   },
   {
     label: "Code Generation",
