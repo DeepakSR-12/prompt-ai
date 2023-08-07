@@ -1,7 +1,7 @@
 "use client";
 
 import Heading from "@/components/heading";
-import { MessageSquare, Music } from "lucide-react";
+import { Music } from "lucide-react";
 import * as z from "zod";
 import { formSchema } from "./constants";
 import { useForm } from "react-hook-form";
@@ -10,7 +10,6 @@ import { Form, FormControl, FormItem, FormField } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import { ChatCompletionRequestMessage } from "openai";
 import { useState } from "react";
 import axios from "axios";
 import Empty from "@/components/empty";
@@ -36,7 +35,7 @@ const MusicPage = () => {
     try {
       setMusic(undefined);
       const response = await axios.post("/api/music", values);
-      setMusic(response.data.audio);
+      setMusic(response.data);
       form.reset();
     } catch (error: any) {
       if (error?.response?.status === 403) {
