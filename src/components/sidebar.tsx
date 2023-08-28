@@ -92,7 +92,7 @@ export const Sidebar = ({
           </h1>
         </Link>
         <div className="space-y-1">
-          {routes.map((route) => (
+          {routes?.map((route) => (
             <Link
               key={route.href}
               href={route.href}

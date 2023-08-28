@@ -116,7 +116,7 @@ const ImagePage = () => {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {amountOptions.map((option) => (
+                        {amountOptions?.map((option) => (
                           <SelectItem key={option.value} value={option.value}>
                             {option.label}
                           </SelectItem>
@@ -144,7 +144,7 @@ const ImagePage = () => {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {resolutionOptions.map((option) => (
+                        {resolutionOptions?.map((option) => (
                           <SelectItem key={option.value} value={option.value}>
                             {option.label}
                           </SelectItem>
@@ -174,7 +174,7 @@ const ImagePage = () => {
             <Empty label="No images generated!" />
           )}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mt-8">
-            {images.map((src, index) => (
+            {images?.map((src, index) => (
               <Card key={index} className="rounded-lg overflow-hidden">
                 <div className="relative aspect-square">
                   <Image fill alt="Generated" src={src} />
