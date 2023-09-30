@@ -10,7 +10,6 @@ import { Form, FormControl, FormItem, FormField } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import { ChatCompletionRequestMessage } from "openai";
 import { useState } from "react";
 import axios from "axios";
 import Empty from "@/components/empty";
@@ -23,7 +22,13 @@ import { useProModal } from "@/hooks/use-pro-modal";
 
 const ConversationPage = () => {
   const router = useRouter();
-  const [messages, setMessages] = useState<ChatCompletionRequestMessage[]>([]);
+  const [messages, setMessages] = useState({
+    conversation: {
+      generated_responses: [],
+      past_user_inputs: [],
+    },
+    generated_text: "",
+  });
   const proModal = useProModal();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -37,17 +42,15 @@ const ConversationPage = () => {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      const userMessage: ChatCompletionRequestMessage = {
-        role: "user",
-        content: values.prompt,
+      const inputs = {
+        ...messages.conversation,
+        text: values.prompt,
       };
-
-      const newMessages = [...messages, userMessage];
       const response = await axios.post("/api/conversation", {
-        messages: newMessages,
+        inputs,
       });
 
-      setMessages((current) => [...current, userMessage, response.data]);
+      setMessages(response?.data);
       form.reset();
     } catch (error: any) {
       if (error?.response?.status === 403) {
@@ -85,7 +88,7 @@ const ConversationPage = () => {
                       <Input
                         className="border-0 outline-none focus-visible:ring-0 focus-visible:ring-transparent"
                         disabled={isLoading}
-                        placeholder="How do I calculate the radius of a circle?"
+                        placeholder="How's the weather today?"
                         {...field}
                       />
                     </FormControl>
@@ -108,22 +111,33 @@ const ConversationPage = () => {
               <Loader />
             </div>
           )}
-          {!messages.length && !isLoading && (
-            <Empty label="No conversation started!" />
-          )}
+          {!messages?.conversation?.generated_responses.length &&
+            !isLoading && <Empty label="No conversation started!" />}
           <div className="flex flex-col-reverse gap-y-4">
-            {messages?.map((message) => (
+            {messages?.conversation?.past_user_inputs.map((message, index) => (
               <div
-                key={message.content}
-                className={cn(
-                  "w-full p-8 flex items-start gap-x-8 rounded-lg",
-                  message.role === "user"
-                    ? "border bg-white border-black/10"
-                    : "bg-muted"
-                )}
+                className="flex flex-col-reverse gap-y-4  space-y-4"
+                key={index}
               >
-                {message.role === "user" ? <UserAvatar /> : <PromptAIAvatar />}
-                <p className="text-sm">{message.content}</p>
+                <div
+                  className={cn(
+                    "w-full p-8 flex items-start gap-x-8 rounded-lg border bg-white border-black/10"
+                  )}
+                >
+                  <UserAvatar />
+                  <p className="text-sm">{message}</p>
+                </div>
+
+                <div
+                  className={cn(
+                    "w-full p-8 flex items-start gap-x-8 rounded-lg bg-muted"
+                  )}
+                >
+                  <PromptAIAvatar />
+                  <p className="text-sm">
+                    {messages?.conversation?.generated_responses[index]}
+                  </p>
+                </div>
               </div>
             ))}
           </div>
