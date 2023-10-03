@@ -58,6 +58,7 @@ const routes = [
     icon: Code,
     color: "text-green-700",
     href: "/code",
+    isPremium: true,
   },
   {
     label: "Settings",

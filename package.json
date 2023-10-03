@@ -25,6 +25,7 @@
     "@types/react": "18.2.15",
     "@types/react-dom": "18.2.7",
     "autoprefixer": "10.4.14",
+    "axios": "^1.5.1",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
     "crisp-sdk-web": "^1.0.19",
@@ -33,7 +34,7 @@
     "lucide-react": "^0.263.1",
     "next": "13.4.11",
     "next-themes": "^0.2.1",
-    "openai": "^3.3.0",
+    "openai": "4.11.0",
     "postcss": "8.4.27",
     "react": "18.2.0",
     "react-dom": "18.2.0",
@@ -47,10 +48,12 @@
     "tailwindcss-animate": "^1.0.6",
     "typescript": "5.1.6",
     "typewriter-effect": "^2.20.1",
+    "uuid": "^9.0.0",
     "zod": "^3.21.4",
     "zustand": "^4.3.9"
   },
   "devDependencies": {
+    "@types/uuid": "^9.0.2",
     "prisma": "^5.0.0"
   }
 }

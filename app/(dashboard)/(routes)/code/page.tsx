@@ -10,7 +10,6 @@ import { Form, FormControl, FormItem, FormField } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import { ChatCompletionRequestMessage } from "openai";
 import { useState } from "react";
 import axios from "axios";
 import Empty from "@/components/empty";
@@ -22,9 +21,14 @@ import ReactMarkdown from "react-markdown";
 import { useProModal } from "@/hooks/use-pro-modal";
 import { toast } from "react-hot-toast";
 
+interface Message {
+  role: string;
+  content: string;
+}
+
 const CodePage = () => {
   const router = useRouter();
-  const [messages, setMessages] = useState<ChatCompletionRequestMessage[]>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const proModal = useProModal();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -38,7 +42,7 @@ const CodePage = () => {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      const userMessage: ChatCompletionRequestMessage = {
+      const userMessage = {
         role: "user",
         content: values.prompt,
       };
@@ -52,6 +56,10 @@ const CodePage = () => {
       form.reset();
     } catch (error: any) {
       if (error?.response?.status === 403) {
+        toast.error(
+          "Code Generation is a premium feature. Please upgrade to pro.",
+          { duration: 2000 }
+        );
         proModal.onOpen();
       } else {
         toast.error("Something went wrong.");
