@@ -2,11 +2,9 @@ import { checkApiLimit, incrementApiLimit } from "@/lib/api-limit";
 import { checkSubscription } from "@/lib/subscription";
 import { auth } from "@clerk/nextjs";
 import { NextResponse } from "next/server";
-import OpenAI from "openai";
 
-const openai = new OpenAI({
-  apiKey: "1234",
-});
+import OpenAI from "openai";
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 const instruction = {
   role: "system",
@@ -28,23 +26,33 @@ export async function POST(req: Request) {
       return new NextResponse("Messages are required", { status: 400 });
     }
 
+    const freeTrial = await checkApiLimit();
     const isPro = await checkSubscription();
 
-    if (!isPro) {
+    if (!freeTrial && !isPro) {
       return new NextResponse(
-        "Code Generation is a premium feature. Please upgrade to pro.",
+        "Free trial has expired. Please upgrade to pro.",
         { status: 403 }
       );
     }
 
-    const response = await openai.chat.completions.create({
+    const payload = {
       messages: [instruction, ...messages],
-      model: "gpt-3.5-turbo",
+    };
+
+    const completion = await openai.chat.completions.create({
+      messages,
+      model: "gpt-3.5-turbo-1106",
     });
 
-    if (!isPro) await incrementApiLimit();
+    const response = completion.choices[0].message.content;
 
-    return NextResponse.json(response.choices[0].message);
+    if (!response) {
+      return new NextResponse("API call failed");
+    }
+
+    if (!isPro) await incrementApiLimit();
+    return NextResponse.json(response);
   } catch (error) {
     console.log("[CODE_ERROR]", error);
     return new NextResponse("Internal Server Error", { status: 500 });

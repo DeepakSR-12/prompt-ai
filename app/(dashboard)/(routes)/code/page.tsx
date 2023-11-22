@@ -52,7 +52,11 @@ const CodePage = () => {
         messages: newMessages,
       });
 
-      setMessages((current) => [...current, userMessage, response.data]);
+      setMessages((current) => [
+        ...current,
+        userMessage,
+        { role: "assistant", content: response.data },
+      ]);
       form.reset();
     } catch (error: any) {
       if (error?.response?.status === 403) {
@@ -118,7 +122,7 @@ const CodePage = () => {
             </div>
           )}
           {!messages.length && !isLoading && (
-            <Empty label="No conversation started!" />
+            <Empty label="No code generated!" />
           )}
           <div className="flex flex-col-reverse gap-y-4">
             {messages?.map((message) => (

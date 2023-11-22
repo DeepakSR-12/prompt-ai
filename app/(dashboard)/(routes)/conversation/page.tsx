@@ -20,15 +20,14 @@ import { cn } from "@/lib/utils";
 import { toast } from "react-hot-toast";
 import { useProModal } from "@/hooks/use-pro-modal";
 
+interface Message {
+  role: string;
+  content: string;
+}
+
 const ConversationPage = () => {
   const router = useRouter();
-  const [messages, setMessages] = useState({
-    conversation: {
-      generated_responses: [],
-      past_user_inputs: [],
-    },
-    generated_text: "",
-  });
+  const [messages, setMessages] = useState<Message[]>([]);
   const proModal = useProModal();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -42,15 +41,21 @@ const ConversationPage = () => {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      const inputs = {
-        ...messages.conversation,
-        text: values.prompt,
+      const userMessage = {
+        role: "user",
+        content: values.prompt,
       };
+
+      const newMessages = [...messages, userMessage];
       const response = await axios.post("/api/conversation", {
-        inputs,
+        messages: newMessages,
       });
 
-      setMessages(response?.data);
+      setMessages((current) => [
+        ...current,
+        userMessage,
+        { role: "assistant", content: response.data },
+      ]);
       form.reset();
     } catch (error: any) {
       if (error?.response?.status === 403) {
@@ -111,33 +116,22 @@ const ConversationPage = () => {
               <Loader />
             </div>
           )}
-          {!messages?.conversation?.generated_responses.length &&
-            !isLoading && <Empty label="No conversation started!" />}
+          {!messages.length && !isLoading && (
+            <Empty label="No conversation started!" />
+          )}
           <div className="flex flex-col-reverse gap-y-4">
-            {messages?.conversation?.past_user_inputs.map((message, index) => (
+            {messages?.map((message, index) => (
               <div
-                className="flex flex-col-reverse gap-y-4  space-y-4"
                 key={index}
+                className={cn(
+                  "w-full p-8 flex items-start gap-x-8 rounded-lg",
+                  message.role === "user"
+                    ? "border bg-white border-black/10"
+                    : "bg-muted"
+                )}
               >
-                <div
-                  className={cn(
-                    "w-full p-8 flex items-start gap-x-8 rounded-lg border bg-white border-black/10"
-                  )}
-                >
-                  <UserAvatar />
-                  <p className="text-sm">{message}</p>
-                </div>
-
-                <div
-                  className={cn(
-                    "w-full p-8 flex items-start gap-x-8 rounded-lg bg-muted"
-                  )}
-                >
-                  <PromptAIAvatar />
-                  <p className="text-sm">
-                    {messages?.conversation?.generated_responses[index]}
-                  </p>
-                </div>
+                {message.role === "user" ? <UserAvatar /> : <PromptAIAvatar />}
+                <p className="text-sm">{message.content}</p>
               </div>
             ))}
           </div>

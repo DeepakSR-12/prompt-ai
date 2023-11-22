@@ -3,21 +3,20 @@ import { checkSubscription } from "@/lib/subscription";
 import { auth } from "@clerk/nextjs";
 import { NextResponse } from "next/server";
 
-const headers = {
-  Authorization: `Bearer ${process.env.HUGGING_FACE_API_KEY!}`,
-};
+import OpenAI from "openai";
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 export async function POST(req: Request) {
   try {
     const { userId } = auth();
     const body = await req.json();
-    const { inputs } = body;
+    const { messages } = body;
 
     if (!userId) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    if (!inputs) {
+    if (!messages) {
       return new NextResponse("Messages are required", { status: 400 });
     }
 
@@ -31,19 +30,15 @@ export async function POST(req: Request) {
       );
     }
 
-    const conversationModel = "facebook/blenderbot-400M-distill";
-    const endpoint = `https://api-inference.huggingface.co/models/${conversationModel}`;
+    const completion = await openai.chat.completions.create({
+      messages,
+      model: "gpt-3.5-turbo-1106",
+    });
 
-    const response = await fetch(endpoint, {
-      method: "POST",
-      headers: headers,
-      body: JSON.stringify({
-        inputs,
-      }),
-    })?.then((res) => res.json());
+    const response = completion.choices[0].message.content;
 
     if (!response) {
-      return new NextResponse("API call failed", { status: response.status });
+      return new NextResponse("API call failed");
     }
 
     if (!isPro) await incrementApiLimit();
