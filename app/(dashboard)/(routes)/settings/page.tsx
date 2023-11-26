@@ -1,11 +1,13 @@
+"use client";
+
 import { Settings } from "lucide-react";
 
 import { SubscriptionButton } from "@/components/subscription-button";
-import { checkSubscription } from "@/lib/subscription";
 import Heading from "@/components/heading";
+import { useProModal } from "@/hooks/use-pro-modal";
 
-const SettingsPage = async () => {
-  const isPro = await checkSubscription();
+const SettingsPage = () => {
+  const { isPro } = useProModal();
 
   return (
     <div>

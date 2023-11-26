@@ -11,7 +11,7 @@ import "./globals.css";
 const font = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Prompt AI",
+  title: "Prompt AI | Chat with the smartest AI - Experience the power of AI",
   description: "Next Generation AI Platform",
 };
 

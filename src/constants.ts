@@ -39,3 +39,8 @@ export const tools = [
     href: "/code",
   },
 ];
+
+export interface Message {
+  role: string;
+  content: string;
+}

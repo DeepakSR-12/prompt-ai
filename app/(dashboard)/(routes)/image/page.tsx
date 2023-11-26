@@ -31,7 +31,7 @@ import { toast } from "react-hot-toast";
 const ImagePage = () => {
   const router = useRouter();
   const [images, setImages] = useState<string[]>([]);
-  const proModal = useProModal();
+  const { onOpen } = useProModal();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -42,6 +42,7 @@ const ImagePage = () => {
     },
   });
 
+  const promptValue = form.watch("prompt");
   const isLoading = form.formState.isSubmitting;
 
   const generateImage = async () => {
@@ -57,7 +58,7 @@ const ImagePage = () => {
       form.reset();
     } catch (error: any) {
       if (error?.response?.status === 403) {
-        proModal.onOpen();
+        onOpen();
       } else {
         toast.error("Something went wrong.");
       }
@@ -89,9 +90,9 @@ const ImagePage = () => {
                   <FormItem className="col-span-12 lg:col-span-6">
                     <FormControl className="m-0 p-0">
                       <Input
-                        className="border-0 outline-none focus-visible:ring-0 focus-visible:ring-transparent"
+                        className="border-0 outline-none focus-visible:ring-0 focus-visible:ring-transparent placeholder:text-slate-300"
                         disabled={isLoading}
-                        placeholder="A picture of a horse in swiss alps"
+                        placeholder="A picture of a dog near the river bank"
                         {...field}
                       />
                     </FormControl>
@@ -156,8 +157,8 @@ const ImagePage = () => {
               />
 
               <Button
-                className="col-span-12 lg:col-span-2 w-full"
-                disabled={isLoading}
+                className="col-span-12 lg:col-span-2 w-full bg-pink-700 hover:bg-pink-700/90"
+                disabled={isLoading || !promptValue.length}
               >
                 Generate
               </Button>
@@ -167,7 +168,7 @@ const ImagePage = () => {
         <div className="space-y-4 mt-4">
           {isLoading && (
             <div className="p-20">
-              <Loader />
+              <Loader message="Image is being generated..." />
             </div>
           )}
           {!images.length && !isLoading && (

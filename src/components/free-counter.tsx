@@ -15,7 +15,7 @@ export const FreeCounter = ({
   apiLimitCount: number;
 }) => {
   const [mounted, setMounted] = useState(false);
-  const proModal = useProModal();
+  const { onOpen } = useProModal();
 
   useEffect(() => {
     setMounted(true);
@@ -42,11 +42,7 @@ export const FreeCounter = ({
               value={(apiLimitCount / MAX_FREE_COUNTS) * 100}
             />
           </div>
-          <Button
-            onClick={proModal.onOpen}
-            variant="premium"
-            className="w-full"
-          >
+          <Button onClick={onOpen} variant="premium" className="w-full">
             Upgrade
             <Zap className="w-4 h-4 ml-2 fill-white" />
           </Button>

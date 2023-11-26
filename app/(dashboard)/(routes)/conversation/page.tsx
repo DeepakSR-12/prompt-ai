@@ -10,7 +10,7 @@ import { Form, FormControl, FormItem, FormField } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import Empty from "@/components/empty";
 import Loader from "@/components/loader";
@@ -28,7 +28,7 @@ interface Message {
 const ConversationPage = () => {
   const router = useRouter();
   const [messages, setMessages] = useState<Message[]>([]);
-  const proModal = useProModal();
+  const { onOpen } = useProModal();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -37,7 +37,22 @@ const ConversationPage = () => {
     },
   });
 
+  const promptValue = form.watch("prompt");
+
   const isLoading = form.formState.isSubmitting;
+
+  const fetchMessages = async () => {
+    try {
+      const response = await axios.get("/api/messages?type=conversation");
+      if (response?.data?.messages) setMessages(response?.data?.messages);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  useEffect(() => {
+    fetchMessages();
+  }, []);
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
@@ -59,7 +74,7 @@ const ConversationPage = () => {
       form.reset();
     } catch (error: any) {
       if (error?.response?.status === 403) {
-        proModal.onOpen();
+        onOpen();
       } else {
         toast.error("Something went wrong.");
       }
@@ -76,6 +91,10 @@ const ConversationPage = () => {
         icon={MessageSquare}
         bgColor="bg-violet-500/10"
         color="text-violet-500"
+        showHistory
+        type="conversation"
+        enableDeleteHistory={!!messages?.length}
+        setMessages={setMessages}
       />
 
       <div className="px-4 lg:px-8">
@@ -91,9 +110,9 @@ const ConversationPage = () => {
                   <FormItem className="col-span-12 lg:col-span-10">
                     <FormControl className="m-0 p-0">
                       <Input
-                        className="border-0 outline-none focus-visible:ring-0 focus-visible:ring-transparent"
+                        className="border-0 outline-none focus-visible:ring-0 focus-visible:ring-transparent placeholder:text-slate-300"
                         disabled={isLoading}
-                        placeholder="How's the weather today?"
+                        placeholder="Write a blog post on stating the pros and cons of Artificial Intelligence"
                         {...field}
                       />
                     </FormControl>
@@ -102,8 +121,8 @@ const ConversationPage = () => {
               />
 
               <Button
-                className="col-span-12 lg:col-span-2 w-full"
-                disabled={isLoading}
+                className="col-span-12 lg:col-span-2 w-full bg-violet-500 hover:bg-violet-500/90"
+                disabled={isLoading || !promptValue.length}
               >
                 Generate
               </Button>

@@ -1,4 +1,6 @@
+import { Message } from "@/constants";
 import { checkApiLimit, incrementApiLimit } from "@/lib/api-limit";
+import { addMessage } from "@/lib/message";
 import { checkSubscription } from "@/lib/subscription";
 import { auth } from "@clerk/nextjs";
 import { NextResponse } from "next/server";
@@ -41,7 +43,19 @@ export async function POST(req: Request) {
       return new NextResponse("API call failed");
     }
 
-    if (!isPro) await incrementApiLimit();
+    if (isPro) {
+      const userMessages: Message[] = [
+        ...messages,
+        {
+          role: "assistant",
+          content: response,
+        },
+      ];
+
+      await addMessage("conversation", userMessages);
+    } else {
+      await incrementApiLimit();
+    }
     return NextResponse.json(response);
   } catch (error) {
     console.log("[CONVERSATION_ERROR]", error);

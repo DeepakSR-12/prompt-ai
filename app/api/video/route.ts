@@ -5,9 +5,7 @@ import { NextResponse } from "next/server";
 import Replicate from "replicate";
 
 const replicate = new Replicate({
-  // Todo: Enable in production
-  // auth: process.env.REPLICATE_API_KEY!,
-  auth: "1234",
+  auth: process.env.REPLICATE_API_KEY!,
 });
 
 export async function POST(req: Request) {

@@ -24,3 +24,23 @@ model UserSubscription {
   stripePriceId          String?   @map(name: "stripe_price_id")
   stripeCurrentPeriodEnd DateTime? @map(name: "stripe_current_period_end")
 }
+
+model UserMessages {
+  id        String    @id @default(cuid())
+  userId    String
+  type      String
+  messages  Message[] // This indicates a one-to-many relationship with Message
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  userMessagesId String // This field establishes the relation to UserMessages
+  role           String
+  content        String
+  createdAt      DateTime     @default(now())
+  userMessages   UserMessages @relation(fields: [userMessagesId], references: [id], onDelete: Cascade)
+
+  @@index([userMessagesId]) // An index for better query performance
+}

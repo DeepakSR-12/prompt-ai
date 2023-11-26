@@ -17,10 +17,10 @@ export const LandingNavbar = () => {
 
   return (
     <nav className="p-4 bg-transparent flex items-center justify-between">
-      <Link href="/" className="flex items-center">
+      <Link href="/" className="flex items-center group">
         <div
           onClick={() => router.push("/dashboard")}
-          className="relative h-8 w-8 mr-4"
+          className="relative h-8 w-8 mr-2 group-hover:animate-spin"
         >
           <Image fill alt="Logo" src="/logo.png" />
         </div>
@@ -30,7 +30,10 @@ export const LandingNavbar = () => {
       </Link>
       <div className="flex items-center gap-x-2">
         <Link href={isSignedIn ? "/dashboard" : "/sign-up"}>
-          <Button variant="outline" className="rounded-full">
+          <Button
+            variant="outline"
+            className="rounded-full hover:bg-black hover:text-white"
+          >
             Get Started
           </Button>
         </Link>

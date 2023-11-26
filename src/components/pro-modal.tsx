@@ -21,7 +21,7 @@ import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
 export const ProModal = () => {
-  const proModal = useProModal();
+  const { isOpen, onClose } = useProModal();
   const [loading, setLoading] = useState(false);
 
   const onSubscribe = async () => {
@@ -38,7 +38,7 @@ export const ProModal = () => {
   };
 
   return (
-    <Dialog open={proModal.isOpen} onOpenChange={proModal.onClose}>
+    <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle className="flex justify-center items-center flex-col gap-y-4 pb-2">
