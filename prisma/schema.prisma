@@ -38,7 +38,7 @@ model Message {
   id             String       @id @default(cuid())
   userMessagesId String // This field establishes the relation to UserMessages
   role           String
-  content        String
+  content        String?      @db.LongText
   createdAt      DateTime     @default(now())
   userMessages   UserMessages @relation(fields: [userMessagesId], references: [id], onDelete: Cascade)
 
