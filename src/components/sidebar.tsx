@@ -91,7 +91,7 @@ export const Sidebar = ({
           </div>
           <h1
             className={cn(
-              "text-2xl font-bold flex items-center space-x-1",
+              "text-2xl font-bold flex items-center space-x-2",
               poppins.className
             )}
           >
