@@ -34,7 +34,7 @@ export const LandingContent = () => {
         {testimonials?.map((item) => (
           <Card
             key={item.description}
-            className="bg-black border border-white text-white"
+            className="bg-black border shadow-white shadow-lg text-white"
           >
             <CardHeader>
               <CardTitle className="flex items-center gap-x-2">
