@@ -3,13 +3,12 @@ generator client {
 }
 
 datasource db {
-  provider     = "mysql"
-  url          = env("DATABASE_URL")
-  relationMode = "prisma"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model UserApiLimit {
-  id        String   @id @default(cuid())
+  id        String   @id @default(uuid())
   userId    String   @unique
   count     Int      @default(0)
   createdAt DateTime @default(now())
@@ -17,30 +16,30 @@ model UserApiLimit {
 }
 
 model UserSubscription {
-  id                     String    @id @default(cuid())
+  id                     String    @id @default(uuid())
   userId                 String    @unique
-  stripeCustomerId       String?   @unique @map(name: "stripe_customer_id")
-  stripeSubscriptionId   String?   @unique @map(name: "stripe_subscription_id")
-  stripePriceId          String?   @map(name: "stripe_price_id")
-  stripeCurrentPeriodEnd DateTime? @map(name: "stripe_current_period_end")
+  stripeCustomerId       String?   @unique @map("stripe_customer_id")
+  stripeSubscriptionId   String?   @unique @map("stripe_subscription_id")
+  stripePriceId          String?   @map("stripe_price_id")
+  stripeCurrentPeriodEnd DateTime? @map("stripe_current_period_end")
 }
 
 model UserMessages {
-  id        String    @id @default(cuid())
+  id        String    @id @default(uuid())
   userId    String
   type      String
-  messages  Message[] // This indicates a one-to-many relationship with Message
+  messages  Message[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 }
 
 model Message {
-  id             String       @id @default(cuid())
-  userMessagesId String // This field establishes the relation to UserMessages
+  id             String       @id @default(uuid())
+  userMessagesId String
   role           String
-  content        String?      @db.LongText
+  content        String?      @db.Text
   createdAt      DateTime     @default(now())
   userMessages   UserMessages @relation(fields: [userMessagesId], references: [id], onDelete: Cascade)
 
-  @@index([userMessagesId]) // An index for better query performance
+  @@index([userMessagesId])
 }

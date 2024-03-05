@@ -48,9 +48,7 @@ export const addMessage = async (type: string, messages: Message[] = []) => {
 export const retrieveMessages = async (type: string) => {
   const { userId } = auth();
 
-  if (!userId) {
-    return false;
-  }
+  if (!userId) return [];
 
   const userMessages = await prismadb.userMessages.findFirst({
     where: { userId, type },
