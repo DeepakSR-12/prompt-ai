@@ -28,12 +28,11 @@ export async function POST(req: Request) {
       return new NextResponse("Prompt is required", { status: 400 });
     }
 
-    const freeTrial = await checkApiLimit();
     const isPro = await checkSubscription();
 
-    if (!freeTrial && !isPro) {
+    if (!isPro) {
       return new NextResponse(
-        "Free trial has expired. Please upgrade to pro.",
+        "Music Generation is a premium feature. Please upgrade to pro.",
         { status: 403 }
       );
     }

@@ -1,12 +1,15 @@
 import { Message } from "@/constants";
-import { checkApiLimit, incrementApiLimit } from "@/lib/api-limit";
+import { incrementApiLimit } from "@/lib/api-limit";
 import { addMessage } from "@/lib/message";
 import { checkSubscription } from "@/lib/subscription";
 import { auth } from "@clerk/nextjs";
 import { NextResponse } from "next/server";
 
 import OpenAI from "openai";
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const openai = new OpenAI({
+  baseURL: process.env.HUGGING_FACE_BASE_URL,
+  apiKey: process.env.HUGGING_FACE_API_KEY,
+});
 
 const instruction = {
   role: "system",
@@ -28,12 +31,11 @@ export async function POST(req: Request) {
       return new NextResponse("Messages are required", { status: 400 });
     }
 
-    const freeTrial = await checkApiLimit();
     const isPro = await checkSubscription();
 
-    if (!freeTrial && !isPro) {
+    if (!isPro) {
       return new NextResponse(
-        "Free trial has expired. Please upgrade to pro.",
+        "Code Generation is a premium feature. Please upgrade to pro.",
         { status: 403 }
       );
     }
@@ -44,7 +46,7 @@ export async function POST(req: Request) {
 
     const completion = await openai.chat.completions.create({
       messages: payload.messages,
-      model: "gpt-3.5-turbo-1106",
+      model: process.env.HUGGING_FACE_AI_MODEL!,
     });
 
     const response = completion.choices[0].message.content;

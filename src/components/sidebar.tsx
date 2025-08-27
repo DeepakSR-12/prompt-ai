@@ -47,12 +47,14 @@ const routes = [
     icon: ImageIcon,
     color: "text-pink-700",
     href: "/image",
+    isPremium: true,
   },
   {
     label: "Music Generation",
     icon: Music,
     color: "text-emerald-500",
     href: "/music",
+    isPremium: true,
   },
   {
     label: "Video Generation",

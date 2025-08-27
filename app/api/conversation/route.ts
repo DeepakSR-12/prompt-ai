@@ -6,7 +6,10 @@ import { auth } from "@clerk/nextjs";
 import { NextResponse } from "next/server";
 
 import OpenAI from "openai";
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const openai = new OpenAI({
+  baseURL: process.env.HUGGING_FACE_BASE_URL,
+  apiKey: process.env.HUGGING_FACE_API_KEY,
+});
 
 export async function POST(req: Request) {
   try {
@@ -34,7 +37,7 @@ export async function POST(req: Request) {
 
     const completion = await openai.chat.completions.create({
       messages,
-      model: "gpt-3.5-turbo-1106",
+      model: process.env.HUGGING_FACE_AI_MODEL!,
     });
 
     const response = completion.choices[0].message.content;
